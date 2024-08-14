@@ -3,14 +3,20 @@ import {
 	TextInput,
 	View,
 	TouchableOpacity,
-	Linking
+	Text
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 
+type MusicItemData = {
+	musicItem: string;
+	id: string;
+}
+
 export default function App() {
 	const [url, setURL] = useState<string>("");
+	const [musicItemData, setMusicItemData] = useState<MusicItemData>();
 
 	const generateSpotifyURI = (spotifyURL: string) => {
 		const splitURL = spotifyURL.split("/");
@@ -18,6 +24,14 @@ export default function App() {
 		const id = splitURL[4].split("?")[0];
 
 		return `spotify:${musicItem}:${id}`;
+	}
+
+	const generateMusicItemData = (spotifyURL: string): MusicItemData => {
+		const splitURL = spotifyURL.split("/");
+		const musicItem = splitURL[3];
+		const id = splitURL[4].split("?")[0];
+
+		return { musicItem, id };
 	}
 
 	return (
@@ -29,13 +43,16 @@ export default function App() {
 			/>
 			<TouchableOpacity
 				style={styles.playButton}
-				onPress={() => Linking.openURL(generateSpotifyURI(url))}
+				onPress={() => {
+					setMusicItemData(generateMusicItemData(url))
+				}}
 			>
 				<FontAwesomeIcon
 					icon={faPlay}
 					size={48}
 				/>
 			</TouchableOpacity>
+			{musicItemData ? (<View><Text>{musicItemData.musicItem}</Text><Text>{musicItemData.id}</Text></View>) : null}
 		</View>
 	);
 }
