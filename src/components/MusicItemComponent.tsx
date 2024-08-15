@@ -1,9 +1,20 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-const MusicItemComponent = ({ musicItem }) => {
+type MusicItem = {
+	musicItem: string;
+	id: string;
+	name: string;
+	imageURL: string
+}
+
+type MusicItemProps = {
+    musicItem: MusicItem;
+}
+
+const MusicItemComponent: React.FC<MusicItemProps> = ({ musicItem }) => {
     return <View style={styles.card}>
-        <Image source={{ uri: musicItem.url }} style={styles.image} />
+        <Image source={{ uri: musicItem.imageURL }} style={styles.image} />
         <Text style={styles.text}>{musicItem.name}</Text>
     </View>
 }

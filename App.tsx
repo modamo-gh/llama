@@ -44,9 +44,9 @@ export default function App() {
 					setMusicItem(item);
 
 					const itemData = await getMusicItemData(item);
-					console.log(itemData)
 					const images = musicItem?.musicItem === "track" ? itemData.album.images : itemData.images;
-					const updatedMusicItem = {...item, name: itemData.name, imageURL: images[0].url};
+					const imageURL = images && images.length > 0 ? images[0].url : null;
+					const updatedMusicItem = {...item, name: itemData.name, imageURL: imageURL};
 					setMusicItem(updatedMusicItem);
 				}}
 			>

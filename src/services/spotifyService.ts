@@ -2,9 +2,11 @@ import axios from "axios";
 import qs from "qs";
 import {SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET} from "@env";
 
-type MusicItemData = {
+type MusicItem = {
 	musicItem: string;
 	id: string;
+	name: string;
+	imageURL: string
 }
 
 const getAuth = async () => {
@@ -36,7 +38,7 @@ const getAuth = async () => {
     }
 };
 
-export const getMusicItemData = async (musicItem: MusicItemData) => {
+export const getMusicItemData = async (musicItem: MusicItem) => {
     const baseURL = "https://api.spotify.com/v1";
 
     try{
