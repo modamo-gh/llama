@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
+import { getMusicItemData } from "./src/services/spotifyService";
 
 type MusicItemData = {
 	musicItem: string;
@@ -43,8 +44,10 @@ export default function App() {
 			/>
 			<TouchableOpacity
 				style={styles.playButton}
-				onPress={() => {
-					setMusicItemData(generateMusicItemData(url))
+				onPress={async () => {
+					const itemData = generateMusicItemData(url);
+					setMusicItemData(itemData)
+					await getMusicItemData(itemData)
 				}}
 			>
 				<FontAwesomeIcon
