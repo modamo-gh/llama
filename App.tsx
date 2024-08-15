@@ -9,30 +9,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import { getMusicItemData } from "./src/services/spotifyService";
+import MusicItemComponent from "./src/components/MusicItemComponent";
 
-type MusicItemData = {
+type MusicItem = {
 	musicItem: string;
 	id: string;
+	name: string;
+	imageURL: string
 }
 
 export default function App() {
 	const [url, setURL] = useState<string>("");
-	const [musicItemData, setMusicItemData] = useState<MusicItemData>();
+	const [musicItem, setMusicItem] = useState<MusicItem>();
 
-	const generateSpotifyURI = (spotifyURL: string) => {
+	const generateMusicItem = (spotifyURL: string): MusicItem => {
 		const splitURL = spotifyURL.split("/");
 		const musicItem = splitURL[3];
 		const id = splitURL[4].split("?")[0];
 
-		return `spotify:${musicItem}:${id}`;
-	}
-
-	const generateMusicItemData = (spotifyURL: string): MusicItemData => {
-		const splitURL = spotifyURL.split("/");
-		const musicItem = splitURL[3];
-		const id = splitURL[4].split("?")[0];
-
-		return { musicItem, id };
+		return { musicItem, id, name: "", imageURL: "" };
 	}
 
 	return (
@@ -45,9 +40,14 @@ export default function App() {
 			<TouchableOpacity
 				style={styles.playButton}
 				onPress={async () => {
-					const itemData = generateMusicItemData(url);
-					setMusicItemData(itemData)
-					await getMusicItemData(itemData)
+					const item = generateMusicItem(url);
+					setMusicItem(item);
+
+					const itemData = await getMusicItemData(item);
+					console.log(itemData)
+					const images = musicItem?.musicItem === "track" ? itemData.album.images : itemData.images;
+					const updatedMusicItem = {...item, name: itemData.name, imageURL: images[0].url};
+					setMusicItem(updatedMusicItem);
 				}}
 			>
 				<FontAwesomeIcon
@@ -55,7 +55,7 @@ export default function App() {
 					size={48}
 				/>
 			</TouchableOpacity>
-			{musicItemData ? (<View><Text>{musicItemData.musicItem}</Text><Text>{musicItemData.id}</Text></View>) : null}
+			{musicItem ? <MusicItemComponent musicItem={musicItem} /> : null}
 		</View>
 	);
 }
