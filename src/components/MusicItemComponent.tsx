@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
         margin: 16,
         display: "flex", flexDirection: "row", alignItems: "center"
     },
-    image: { height: 64, width: 64, margin: 1, flex: 1, marginLeft: 16 },
+    image: { height: 64, width: 64, margin: 1, marginLeft: 16 },
     text: {
-        fontSize: 20, flex: 3, marginLeft: 10, color: "#FCFCFC"
+        fontSize: 20, flex: 1, marginLeft: 10, color: "#FCFCFC"
     },
     playButton: {
         height: 64,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         borderRadius: "50%",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center", flex: 1
+        alignItems: "center"
     }
 });
 

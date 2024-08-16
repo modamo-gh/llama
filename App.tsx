@@ -10,6 +10,7 @@ import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import { getMusicItemData } from "./src/services/spotifyService";
 import MusicItemComponent from "./src/components/MusicItemComponent";
+import Toast from "react-native-toast-message";
 
 type MusicItem = {
 	musicItem: string;
@@ -17,7 +18,7 @@ type MusicItem = {
 	name: string;
 	imageURL: string;
 	spotifyURI: string;
-}
+};
 
 export default function App() {
 	const [url, setURL] = useState<string>("");
@@ -29,6 +30,14 @@ export default function App() {
 		const id = splitURL[4].split("?")[0];
 
 		return { musicItem, id, name: "", imageURL: "", spotifyURI: "" };
+	};
+
+	const showDuplicationToast = () => {
+		Toast.show({
+			type: "error",
+			text1: "Music Item Already Exists in List",
+			position: "bottom"
+		})
 	}
 
 	return (
@@ -43,11 +52,33 @@ export default function App() {
 				onPress={async () => {
 					const item = generateMusicItem(url);
 					const itemData = await getMusicItemData(item);
-					console.log(itemData)
-					const images = item?.musicItem === "track" ? itemData.album.images : itemData.images;
-					const imageURL = images && images.length > 0 ? images[images.length - 1].url : null;
-					const updatedMusicItem = { ...item, name: itemData.name, imageURL: imageURL, spotifyURI: itemData.uri };
-					const updatedMusicItems = [...musicItems, updatedMusicItem];
+					const images =
+						item?.musicItem === "track"
+							? itemData.album.images
+							: itemData.images;
+					const imageURL =
+						images && images.length > 0
+							? images[images.length - 1].url
+							: null;
+					const updatedMusicItem = {
+						...item,
+						name: itemData.name,
+						imageURL: imageURL,
+						spotifyURI: itemData.uri
+					};
+
+					let updatedMusicItems;
+
+					if (musicItems.find(
+						(musicItem) => updatedMusicItem.id === musicItem.id
+					)) { updatedMusicItems = [...musicItems]; showDuplicationToast() }
+					else {
+						updatedMusicItems = [
+							...musicItems,
+							updatedMusicItem
+						]
+					}
+					
 					setMusicItems(updatedMusicItems);
 				}}
 			>
@@ -56,7 +87,17 @@ export default function App() {
 					size={48}
 				/>
 			</TouchableOpacity>
-			{musicItems ? (<FlatList style={{ width: "100%" }} data={musicItems} keyExtractor={item => item.id} renderItem={({ item }) => { return <MusicItemComponent musicItem={item} /> }} />) : null}
+			{musicItems ? (
+				<FlatList
+					style={{ width: "100%" }}
+					data={musicItems}
+					keyExtractor={(item) => item.id}
+					renderItem={({ item }) => {
+						return <MusicItemComponent musicItem={item} />;
+					}}
+				/>
+			) : null}
+			<Toast />
 		</View>
 	);
 }
@@ -84,6 +125,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 5,
 		marginHorizontal: 16,
-		marginTop: 64
+		marginTop: 64,
+		color: "#FCFCFC"
 	}
 });
