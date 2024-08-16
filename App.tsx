@@ -47,6 +47,9 @@ export default function App() {
 					style={styles.textInput}
 					value={url}
 					onChangeText={(term: string) => setURL(term)}
+					placeholder="Enter a Spotify URL"
+					placeholderTextColor="#7D7D7D"
+					
 				/>
 				<TouchableOpacity
 					style={styles.addButton}
@@ -119,7 +122,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center"
 	},
-
 	textInput: {
 		flex: 1,
 		marginHorizontal: 8,
@@ -127,6 +129,7 @@ const styles = StyleSheet.create({
 		borderColor: "#1DB954",
 		borderWidth: 1,
 		borderRadius: 5,
-		color: "#FCFCFC"
+		color: "#FCFCFC",
+		paddingHorizontal: 8
 	}
 });
