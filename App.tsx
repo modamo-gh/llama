@@ -6,7 +6,7 @@ import {
 	FlatList
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import { getMusicItemData } from "./src/services/spotifyService";
 import MusicItemComponent from "./src/components/MusicItemComponent";
@@ -42,51 +42,52 @@ export default function App() {
 
 	return (
 		<View style={styles.container}>
-			<TextInput
-				style={styles.textInput}
-				value={url}
-				onChangeText={(term: string) => setURL(term)}
-			/>
-			<TouchableOpacity
-				style={styles.playButton}
-				onPress={async () => {
-					const item = generateMusicItem(url);
-					const itemData = await getMusicItemData(item);
-					const images =
-						item?.musicItem === "track"
-							? itemData.album.images
-							: itemData.images;
-					const imageURL =
-						images && images.length > 0
-							? images[images.length - 1].url
-							: null;
-					const updatedMusicItem = {
-						...item,
-						name: itemData.name,
-						imageURL: imageURL,
-						spotifyURI: itemData.uri
-					};
-
-					let updatedMusicItems;
-
-					if (musicItems.find(
-						(musicItem) => updatedMusicItem.id === musicItem.id
-					)) { updatedMusicItems = [...musicItems]; showDuplicationToast() }
-					else {
-						updatedMusicItems = [
-							...musicItems,
-							updatedMusicItem
-						]
-					}
-					
-					setMusicItems(updatedMusicItems);
-				}}
-			>
-				<FontAwesomeIcon
-					icon={faPlay}
-					size={48}
+			<View style={{ flexDirection: "row", alignItems: "center", width: "100%", marginTop: 64 }}>
+				<TextInput
+					style={styles.textInput}
+					value={url}
+					onChangeText={(term: string) => setURL(term)}
 				/>
-			</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.addButton}
+					onPress={async () => {
+						const item = generateMusicItem(url);
+						const itemData = await getMusicItemData(item);
+						const images =
+							item?.musicItem === "track"
+								? itemData.album.images
+								: itemData.images;
+						const imageURL =
+							images && images.length > 0
+								? images[images.length - 1].url
+								: null;
+						const updatedMusicItem = {
+							...item,
+							name: itemData.name,
+							imageURL: imageURL,
+							spotifyURI: itemData.uri
+						};
+
+						let updatedMusicItems;
+
+						if (musicItems.find(
+							(musicItem) => updatedMusicItem.id === musicItem.id
+						)) { updatedMusicItems = [...musicItems]; showDuplicationToast() }
+						else {
+							updatedMusicItems = [
+								...musicItems,
+								updatedMusicItem
+							]
+						}
+
+						setMusicItems(updatedMusicItems);
+					}}
+				>
+					<FontAwesomeIcon
+						icon={faPlus}
+						size={24}
+					/>
+				</TouchableOpacity></View>
 			{musicItems ? (
 				<FlatList
 					style={{ width: "100%" }}
@@ -103,29 +104,29 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#121212",
-		alignItems: "center",
-		justifyContent: "center"
-	},
-	playButton: {
-		height: 96,
-		width: 96,
+	addButton: {
+		height: 48,
+		width: 48,
 		backgroundColor: "#1DB954",
 		borderRadius: 48,
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center"
 	},
+	container: {
+		flex: 1,
+		backgroundColor: "#121212",
+		alignItems: "center",
+		justifyContent: "center"
+	},
+
 	textInput: {
-		width: "75%",
+		flex: 1,
+		marginHorizontal: 8,
 		height: 48,
 		borderColor: "#1DB954",
 		borderWidth: 1,
 		borderRadius: 5,
-		marginHorizontal: 16,
-		marginTop: 64,
 		color: "#FCFCFC"
 	}
 });

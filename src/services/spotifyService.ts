@@ -7,7 +7,7 @@ type MusicItem = {
 	id: string;
 	name: string;
 	imageURL: string;
-	stringURI: string;
+	spotifyURI: string;
 };
 
 const getAuth = async () => {
