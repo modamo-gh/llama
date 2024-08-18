@@ -41,7 +41,7 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({ musicItem }) => {
 			>
 				<FontAwesomeIcon
 					icon={faPlay}
-					size={32}
+					size={24}
 				/>
 			</TouchableOpacity>
 		</View>
@@ -51,19 +51,18 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({ musicItem }) => {
 const styles = StyleSheet.create({
 	card: {
 		height: 96,
-		margin: 16,
 		display: "flex",
 		flexDirection: "row",
 		alignItems: "center"
 	},
-	image: { height: 64, width: 64, margin: 1, marginLeft: 16 },
+	image: { height: 64, width: 64, margin: 1, marginLeft: 16, borderRadius: 5 },
 	text: {
 		fontSize: 20,
 		color: "#FCFCFC"
 	},
 	playButton: {
-		height: 64,
-		width: 64,
+		height: 48,
+		width: 48,
 		backgroundColor: "#1DB954",
 		borderRadius: "50%",
 		display: "flex",
