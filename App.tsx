@@ -1,26 +1,27 @@
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
 import {
+	FlatList,
 	StyleSheet,
 	TextInput,
-	View,
 	TouchableOpacity,
-	FlatList
+	View
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
-import { getMusicItemData } from "./src/services/spotifyService";
-import MusicItemComponent from "./src/components/MusicItemComponent";
 import Toast from "react-native-toast-message";
+import MusicItemComponent from "./src/components/MusicItemComponent";
+import { getMusicItemData } from "./src/services/spotifyService";
 
 type MusicItem = {
-	musicItem: string;
 	id: string;
-	name: string;
 	imageURL: string;
+	musicItem: string;
+	name: string;
 	spotifyURI: string;
 };
 
-export default function App() {
+const App = () => {
 	const [url, setURL] = useState<string>("");
 	const [musicItems, setMusicItems] = useState<MusicItem[]>([]);
 
@@ -32,27 +33,49 @@ export default function App() {
 		return { musicItem, id, name: "", imageURL: "", spotifyURI: "" };
 	};
 
+	const getMusicItems = async () => {
+		try {
+			const storedMusicItems = await AsyncStorage.getItem("musicItems");
+
+			if (storedMusicItems) {
+				setMusicItems(JSON.parse(storedMusicItems));
+			}
+		} catch (error) {
+			console.log("Something went wrong retrieving music items:", error);
+		}
+	};
+
 	const showDuplicationToast = () => {
 		Toast.show({
 			type: "error",
 			text1: "Music Item Already Exists in List",
 			position: "bottom"
-		})
-	}
+		});
+	};
+
+	useEffect(() => {
+		getMusicItems();
+	}, []);
 
 	return (
 		<View style={styles.container}>
-			<View style={{ flexDirection: "row", alignItems: "center", width: "100%", marginTop: 64}}>
+			<View
+				style={{
+					alignItems: "center",
+					flexDirection: "row",
+					marginTop: 64,
+					width: "100%"
+				}}
+			>
 				<TextInput
-					style={styles.textInput}
-					value={url}
 					onChangeText={(term: string) => setURL(term)}
 					placeholder="Enter a Spotify URL"
 					placeholderTextColor="#7D7D7D"
 					selectionColor="#1DB954"
+					style={styles.textInput}
+					value={url}
 				/>
 				<TouchableOpacity
-					style={styles.addButton}
 					onPress={async () => {
 						const item = generateMusicItem(url);
 						const itemData = await getMusicItemData(item);
@@ -73,29 +96,47 @@ export default function App() {
 
 						let updatedMusicItems;
 
-						if (musicItems.find(
-							(musicItem) => updatedMusicItem.id === musicItem.id
-						)) { updatedMusicItems = [...musicItems]; showDuplicationToast() }
-						else {
+						if (
+							musicItems.find(
+								(musicItem) =>
+									updatedMusicItem.id === musicItem.id
+							)
+						) {
+							updatedMusicItems = [...musicItems];
+							showDuplicationToast();
+						} else {
 							updatedMusicItems = [
 								...musicItems,
 								updatedMusicItem
-							]
+							];
 						}
 
-						setMusicItems(updatedMusicItems);
+						try {
+							await AsyncStorage.setItem(
+								"musicItems",
+								JSON.stringify(updatedMusicItems)
+							);
+							setMusicItems(updatedMusicItems);
+						} catch (error) {
+							console.error(
+								"Something went wrong adding music item:",
+								error
+							);
+						}
 					}}
+					style={styles.addButton}
 				>
 					<FontAwesomeIcon
 						icon={faPlus}
 						size={24}
 					/>
-				</TouchableOpacity></View>
+				</TouchableOpacity>
+			</View>
 			{musicItems ? (
 				<FlatList
-					style={{ width: "100%" }}
 					data={musicItems}
 					keyExtractor={(item) => item.id}
+					style={{ width: "100%" }}
 					renderItem={({ item }) => {
 						return <MusicItemComponent musicItem={item} />;
 					}}
@@ -104,32 +145,34 @@ export default function App() {
 			<Toast />
 		</View>
 	);
-}
+};
 
 const styles = StyleSheet.create({
 	addButton: {
-		height: 48,
-		width: 48,
+		alignItems: "center",
 		backgroundColor: "#1DB954",
 		borderRadius: 48,
 		display: "flex",
+		height: 48,
 		justifyContent: "center",
-		alignItems: "center"
+		width: 48
 	},
 	container: {
-		flex: 1,
-		backgroundColor: "#121212",
 		alignItems: "center",
+		backgroundColor: "#121212",
+		flex: 1,
 		justifyContent: "center"
 	},
 	textInput: {
-		flex: 1,
-		marginHorizontal: 16,
-		height: 48,
 		borderColor: "#1DB954",
-		borderWidth: 1,
 		borderRadius: 5,
+		borderWidth: 1,
 		color: "#FCFCFC",
+		flex: 1,
+		height: 48,
+		marginHorizontal: 16,
 		paddingHorizontal: 8
 	}
 });
+
+export default App;
