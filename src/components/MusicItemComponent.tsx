@@ -5,7 +5,8 @@ import {
 	Text,
 	View,
 	TouchableOpacity,
-	Linking
+	Linking,
+	ImageStyle
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center"
 	},
-	image: { height: 64, width: 64, margin: 1, marginLeft: 16, borderRadius: 5 },
+	image: { height: 64, width: 64, margin: 1, marginLeft: 16, borderRadius: 5 } as ImageStyle,
 	text: {
 		fontSize: 20,
 		color: "#FCFCFC"
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
 		height: 48,
 		width: 48,
 		backgroundColor: "#1DB954",
-		borderRadius: "50%",
+		borderRadius: 24,
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center"
