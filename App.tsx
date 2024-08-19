@@ -12,6 +12,7 @@ import {
 import Toast from "react-native-toast-message";
 import MusicItemComponent from "./src/components/MusicItemComponent";
 import { getMusicItemData } from "./src/services/spotifyService";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
 
 type MusicItem = {
 	id: string;
@@ -45,6 +46,12 @@ const App = () => {
 		}
 	};
 
+	const handleDelete = (index: number) => {
+		const musicItemsCopy = [...musicItems];
+		musicItemsCopy.splice(index, 1);
+		setMusicItems(musicItemsCopy);
+	}
+
 	const showDuplicationToast = () => {
 		Toast.show({
 			type: "error",
@@ -58,92 +65,94 @@ const App = () => {
 	}, []);
 
 	return (
-		<View style={styles.container}>
-			<View
-				style={{
-					alignItems: "center",
-					flexDirection: "row",
-					marginTop: 64,
-					width: "100%"
-				}}
-			>
-				<TextInput
-					onChangeText={(term: string) => setURL(term)}
-					placeholder="Enter a Spotify URL"
-					placeholderTextColor="#7D7D7D"
-					selectionColor="#1DB954"
-					style={styles.textInput}
-					value={url}
-				/>
-				<TouchableOpacity
-					onPress={async () => {
-						const item = generateMusicItem(url);
-						const itemData = await getMusicItemData(item);
-						const images =
-							item?.musicItem === "track"
-								? itemData.album.images
-								: itemData.images;
-						const imageURL =
-							images && images.length > 0
-								? images[images.length - 1].url
-								: null;
-						const updatedMusicItem = {
-							...item,
-							name: itemData.name,
-							imageURL: imageURL,
-							spotifyURI: itemData.uri
-						};
-
-						let updatedMusicItems;
-
-						if (
-							musicItems.find(
-								(musicItem) =>
-									updatedMusicItem.id === musicItem.id
-							)
-						) {
-							updatedMusicItems = [...musicItems];
-							showDuplicationToast();
-						} else {
-							updatedMusicItems = [
-								...musicItems,
-								updatedMusicItem
-							];
-						}
-
-						try {
-							await AsyncStorage.setItem(
-								"musicItems",
-								JSON.stringify(updatedMusicItems)
-							);
-							setMusicItems(updatedMusicItems);
-						} catch (error) {
-							console.error(
-								"Something went wrong adding music item:",
-								error
-							);
-						}
+		<GestureHandlerRootView>
+			<View style={styles.container}>
+				<View
+					style={{
+						alignItems: "center",
+						flexDirection: "row",
+						marginTop: 64,
+						width: "100%"
 					}}
-					style={styles.addButton}
 				>
-					<FontAwesomeIcon
-						icon={faPlus}
-						size={24}
+					<TextInput
+						onChangeText={(term: string) => setURL(term)}
+						placeholder="Enter a Spotify URL"
+						placeholderTextColor="#7D7D7D"
+						selectionColor="#1DB954"
+						style={styles.textInput}
+						value={url}
 					/>
-				</TouchableOpacity>
+					<TouchableOpacity
+						onPress={async () => {
+							const item = generateMusicItem(url);
+							const itemData = await getMusicItemData(item);
+							const images =
+								item?.musicItem === "track"
+									? itemData.album.images
+									: itemData.images;
+							const imageURL =
+								images && images.length > 0
+									? images[images.length - 1].url
+									: null;
+							const updatedMusicItem = {
+								...item,
+								name: itemData.name,
+								imageURL: imageURL,
+								spotifyURI: itemData.uri
+							};
+
+							let updatedMusicItems;
+
+							if (
+								musicItems.find(
+									(musicItem) =>
+										updatedMusicItem.id === musicItem.id
+								)
+							) {
+								updatedMusicItems = [...musicItems];
+								showDuplicationToast();
+							} else {
+								updatedMusicItems = [
+									...musicItems,
+									updatedMusicItem
+								];
+							}
+
+							try {
+								await AsyncStorage.setItem(
+									"musicItems",
+									JSON.stringify(updatedMusicItems)
+								);
+								setMusicItems(updatedMusicItems);
+							} catch (error) {
+								console.error(
+									"Something went wrong adding music item:",
+									error
+								);
+							}
+						}}
+						style={styles.addButton}
+					>
+						<FontAwesomeIcon
+							icon={faPlus}
+							size={24}
+						/>
+					</TouchableOpacity>
+				</View>
+				{musicItems ? (
+					<FlatList
+						data={musicItems}
+						keyExtractor={(item) => item.id}
+						style={{ width: "100%" }}
+						renderItem={({ item, index }) => {
+							return <MusicItemComponent musicItem={item} handleDelete={() => handleDelete(index)}/>;
+						}}
+					/>
+				) : null}
+				<Toast />
 			</View>
-			{musicItems ? (
-				<FlatList
-					data={musicItems}
-					keyExtractor={(item) => item.id}
-					style={{ width: "100%" }}
-					renderItem={({ item }) => {
-						return <MusicItemComponent musicItem={item} />;
-					}}
-				/>
-			) : null}
-			<Toast />
-		</View>
+		</GestureHandlerRootView>
 	);
 };
 
