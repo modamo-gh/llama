@@ -13,6 +13,7 @@ import Toast from "react-native-toast-message";
 import MusicItemComponent from "./src/components/MusicItemComponent";
 import { getMusicItemData } from "./src/services/spotifyService";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Text } from "react-native";
 
 type MusicItem = {
 	id: string;
@@ -20,6 +21,25 @@ type MusicItem = {
 	musicItem: string;
 	name: string;
 	spotifyURI: string;
+};
+
+const toastConfig = {
+	duplicate: ({ text1 }) => (
+		<View
+			style={{
+				borderColor: "#1DB954",
+				borderWidth: 2,
+				height: 48,
+				width: "80%",
+				backgroundColor: "#121212",
+				justifyContent: "center",
+				alignItems: "center",
+				borderRadius: 5
+			}}
+		>
+			<Text style={{ color: "#FCFCFC", fontSize: 20 }}>{text1}</Text>
+		</View>
+	)
 };
 
 const App = () => {
@@ -63,7 +83,7 @@ const App = () => {
 
 	const showDuplicationToast = () => {
 		Toast.show({
-			type: "error",
+			type: "duplicate",
 			text1: "Music Item Already Exists in List",
 			position: "bottom"
 		});
@@ -129,6 +149,8 @@ const App = () => {
 								];
 							}
 
+							setURL("");
+
 							try {
 								await AsyncStorage.setItem(
 									"musicItems",
@@ -165,7 +187,7 @@ const App = () => {
 						}}
 					/>
 				) : null}
-				<Toast />
+				<Toast config={toastConfig} />
 			</View>
 		</GestureHandlerRootView>
 	);
