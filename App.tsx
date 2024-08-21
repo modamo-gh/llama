@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
 		display: "flex",
 		height: 48,
 		justifyContent: "center",
-		width: 48
+		width: 48, marginRight: 16
 	},
 	container: {
 		alignItems: "center",

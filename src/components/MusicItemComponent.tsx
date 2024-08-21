@@ -63,7 +63,7 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 	};
 
 	const renderRight = () => {};
-	
+
 	return (
 		<Swipeable
 			renderLeftActions={renderLeft}
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 		borderRadius: 24,
 		display: "flex",
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",  marginRight: 16
 	}
 });
 
