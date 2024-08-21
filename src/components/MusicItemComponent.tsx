@@ -11,7 +11,7 @@ import {
 	View
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { Extrapolation, interpolate, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 
 type MusicItem = {
 	id: string;
@@ -32,7 +32,7 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 }) => {
 	const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
-	const renderLeft = (progress, dragX) => {
+	const renderLeft = (progress: SharedValue<number>, dragX: SharedValue<number>) => {
 		const animatedStyle = useAnimatedStyle(() => ({
 			transform: [
 			  {
@@ -61,9 +61,13 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 			</AnimatedTouchableOpacity>
 		);
 	};
+
+	const renderRight = () => {};
+	
 	return (
 		<Swipeable
 			renderLeftActions={renderLeft}
+			renderRightActions={renderRight}
 			overshootLeft={false}
 		>
 			<View style={styles.card}>
