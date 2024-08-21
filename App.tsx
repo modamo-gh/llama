@@ -12,7 +12,7 @@ import {
 import Toast from "react-native-toast-message";
 import MusicItemComponent from "./src/components/MusicItemComponent";
 import { getMusicItemData } from "./src/services/spotifyService";
-import {GestureHandlerRootView} from "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 type MusicItem = {
 	id: string;
@@ -46,11 +46,20 @@ const App = () => {
 		}
 	};
 
-	const handleDelete = (index: number) => {
+	const handleDelete = async (index: number) => {
 		const musicItemsCopy = [...musicItems];
 		musicItemsCopy.splice(index, 1);
-		setMusicItems(musicItemsCopy);
-	}
+
+		try {
+			await AsyncStorage.setItem(
+				"musicItems",
+				JSON.stringify(musicItemsCopy)
+			);
+			setMusicItems(musicItemsCopy);
+		} catch (error) {
+			console.error("Something went wrong deleting music item:", error);
+		}
+	};
 
 	const showDuplicationToast = () => {
 		Toast.show({
@@ -71,6 +80,7 @@ const App = () => {
 					style={{
 						alignItems: "center",
 						flexDirection: "row",
+						marginBottom: 8,
 						marginTop: 64,
 						width: "100%"
 					}}
@@ -146,7 +156,12 @@ const App = () => {
 						keyExtractor={(item) => item.id}
 						style={{ width: "100%" }}
 						renderItem={({ item, index }) => {
-							return <MusicItemComponent musicItem={item} handleDelete={() => handleDelete(index)}/>;
+							return (
+								<MusicItemComponent
+									musicItem={item}
+									handleDelete={() => handleDelete(index)}
+								/>
+							);
 						}}
 					/>
 				) : null}
