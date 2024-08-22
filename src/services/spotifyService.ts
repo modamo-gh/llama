@@ -60,7 +60,7 @@ export const getMusicItemData = async (musicItem: MusicItem) => {
 				}
 			}
 		);
-
+		
 		return response.data;
 	} catch (error) {
 		console.log(error);

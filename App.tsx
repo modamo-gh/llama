@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
 	FlatList,
+	Keyboard,
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
@@ -39,6 +40,22 @@ const toastConfig = {
 		>
 			<Text style={{ color: "#FCFCFC", fontSize: 20 }}>{text1}</Text>
 		</View>
+	),
+	episode: ({ text1 }) => (
+		<View
+			style={{
+				borderColor: "#1DB954",
+				borderWidth: 2,
+				height: 48,
+				width: "80%",
+				backgroundColor: "#121212",
+				justifyContent: "center",
+				alignItems: "center",
+				borderRadius: 5
+			}}
+		>
+			<Text style={{ color: "#FCFCFC", fontSize: 20 }}>{text1}</Text>
+		</View>
 	)
 };
 
@@ -53,6 +70,80 @@ const App = () => {
 
 		return { musicItem, id, name: "", imageURL: "", spotifyURI: "" };
 	};
+
+	const showDuplicationToast = () => {
+		Toast.show({
+			type: "duplicate",
+			text1: "Music Item Already Exists in List",
+			position: "bottom"
+		});
+	};
+
+	const showEpisodeToast = () => {
+		Toast.show({
+			type: "episode",
+			text1: "Sorry, can't add episodes right now.",
+			position: "bottom"
+		});
+	};
+
+	const addMusicItem = async () => {
+		Keyboard.dismiss();
+
+		const item = generateMusicItem(url);
+
+		if(item.musicItem === "episode"){
+			showEpisodeToast();
+		}
+		else{
+		const itemData = await getMusicItemData(item);
+		const images =
+			item?.musicItem === "track"
+				? itemData.album.images
+				: itemData.images;
+		const imageURL =
+			images && images.length > 0
+				? images[images.length - 1].url
+				: null;
+		const updatedMusicItem = {
+			...item,
+			name: itemData.name,
+			imageURL: imageURL,
+			spotifyURI: itemData.uri
+		};
+
+		let updatedMusicItems;
+
+		if (
+			musicItems.find(
+				(musicItem) =>
+					updatedMusicItem.id === musicItem.id
+			)
+		) {
+			updatedMusicItems = [...musicItems];
+			showDuplicationToast();
+		} else {
+			updatedMusicItems = [
+				...musicItems,
+				updatedMusicItem
+			];
+		}
+
+		setURL("");
+
+		try {
+			await AsyncStorage.setItem(
+				"musicItems",
+				JSON.stringify(updatedMusicItems)
+			);
+			setMusicItems(updatedMusicItems);
+		} catch (error) {
+			console.error(
+				"Something went wrong adding music item:",
+				error
+			);
+		}}
+	}
 
 	const getMusicItems = async () => {
 		try {
@@ -81,14 +172,6 @@ const App = () => {
 		}
 	};
 
-	const showDuplicationToast = () => {
-		Toast.show({
-			type: "duplicate",
-			text1: "Music Item Already Exists in List",
-			position: "bottom"
-		});
-	};
-
 	useEffect(() => {
 		getMusicItems();
 	}, []);
@@ -112,58 +195,10 @@ const App = () => {
 						selectionColor="#1DB954"
 						style={styles.textInput}
 						value={url}
+						onEndEditing={addMusicItem}
 					/>
 					<TouchableOpacity
-						onPress={async () => {
-							const item = generateMusicItem(url);
-							const itemData = await getMusicItemData(item);
-							const images =
-								item?.musicItem === "track"
-									? itemData.album.images
-									: itemData.images;
-							const imageURL =
-								images && images.length > 0
-									? images[images.length - 1].url
-									: null;
-							const updatedMusicItem = {
-								...item,
-								name: itemData.name,
-								imageURL: imageURL,
-								spotifyURI: itemData.uri
-							};
-
-							let updatedMusicItems;
-
-							if (
-								musicItems.find(
-									(musicItem) =>
-										updatedMusicItem.id === musicItem.id
-								)
-							) {
-								updatedMusicItems = [...musicItems];
-								showDuplicationToast();
-							} else {
-								updatedMusicItems = [
-									...musicItems,
-									updatedMusicItem
-								];
-							}
-
-							setURL("");
-
-							try {
-								await AsyncStorage.setItem(
-									"musicItems",
-									JSON.stringify(updatedMusicItems)
-								);
-								setMusicItems(updatedMusicItems);
-							} catch (error) {
-								console.error(
-									"Something went wrong adding music item:",
-									error
-								);
-							}
-						}}
+						onPress={addMusicItem}
 						style={styles.addButton}
 					>
 						<FontAwesomeIcon
@@ -189,7 +224,7 @@ const App = () => {
 				) : null}
 				<Toast config={toastConfig} />
 			</View>
-		</GestureHandlerRootView>
+		</GestureHandlerRootView >
 	);
 };
 
