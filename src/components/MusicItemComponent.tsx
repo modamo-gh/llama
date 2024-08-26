@@ -11,7 +11,12 @@ import {
 	View
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+	Extrapolation,
+	interpolate,
+	SharedValue,
+	useAnimatedStyle
+} from "react-native-reanimated";
 
 type MusicItem = {
 	id: string;
@@ -19,6 +24,7 @@ type MusicItem = {
 	musicItem: string;
 	name: string;
 	spotifyURI: string;
+	spotifyURL: string;
 };
 
 type MusicItemProps = {
@@ -30,21 +36,25 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 	handleDelete,
 	musicItem
 }) => {
-	const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+	const AnimatedTouchableOpacity =
+		Animated.createAnimatedComponent(TouchableOpacity);
 
-	const renderLeft = (progress: SharedValue<number>, dragX: SharedValue<number>) => {
+	const renderLeft = (
+		progress: SharedValue<number>,
+		dragX: SharedValue<number>
+	) => {
 		const animatedStyle = useAnimatedStyle(() => ({
 			transform: [
-			  {
-				translateX: interpolate(
-				  dragX.value,
-				  [0, 50, 100],
-				  [-100, -50, 0],
-				  Extrapolation.CLAMP
-				),
-			  },
-			],
-		  }));
+				{
+					translateX: interpolate(
+						dragX.value,
+						[0, 50, 100],
+						[-100, -50, 0],
+						Extrapolation.CLAMP
+					)
+				}
+			]
+		}));
 		return (
 			<AnimatedTouchableOpacity
 				onPress={handleDelete}
@@ -54,8 +64,9 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 						width: 100,
 						justifyContent: "center",
 						alignItems: "center"
-					}, animatedStyle]
-				}
+					},
+					animatedStyle
+				]}
 			>
 				<Text style={styles.text}>Delete</Text>
 			</AnimatedTouchableOpacity>
@@ -85,7 +96,20 @@ const MusicItemComponent: React.FC<MusicItemProps> = ({
 				</View>
 				<TouchableOpacity
 					style={styles.playButton}
-					onPress={async () => Linking.openURL(musicItem.spotifyURI)}
+					onPress={async () => {
+						try {
+							const canOpen = await Linking.canOpenURL(
+								musicItem.spotifyURI
+							);
+							if (canOpen) {
+								Linking.openURL(musicItem.spotifyURI);
+							} else {
+								Linking.openURL(musicItem.spotifyURL);
+							}
+						} catch (error) {
+							console.error("Error opening URL:", error);
+						}
+					}}
 				>
 					<FontAwesomeIcon
 						icon={faPlay}
@@ -122,7 +146,8 @@ const styles = StyleSheet.create({
 		borderRadius: 24,
 		display: "flex",
 		justifyContent: "center",
-		alignItems: "center",  marginRight: 16
+		alignItems: "center",
+		marginRight: 16
 	}
 });
 

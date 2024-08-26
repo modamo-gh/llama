@@ -1,6 +1,6 @@
 import axios from "axios";
 import qs from "qs";
-import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from "@env";
+import { EXPO_SPOTIFY_CLIENT_ID, EXPO_SPOTIFY_CLIENT_SECRET } from "@env";
 
 type MusicItem = {
 	musicItem: string;
@@ -11,8 +11,8 @@ type MusicItem = {
 };
 
 const getAuth = async () => {
-	const clientID = SPOTIFY_CLIENT_ID;
-	const clientSecret = SPOTIFY_CLIENT_SECRET;
+	const clientID = EXPO_SPOTIFY_CLIENT_ID;
+	const clientSecret = EXPO_SPOTIFY_CLIENT_SECRET;
 
 	const headers = {
 		headers: {

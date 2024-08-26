@@ -22,6 +22,7 @@ type MusicItem = {
 	musicItem: string;
 	name: string;
 	spotifyURI: string;
+	spotifyURL: string;
 };
 
 const toastConfig = {
@@ -68,7 +69,7 @@ const App = () => {
 		const musicItem = splitURL[3];
 		const id = splitURL[4].split("?")[0];
 
-		return { musicItem, id, name: "", imageURL: "", spotifyURI: "" };
+		return { musicItem, id, name: "", imageURL: "", spotifyURI: "", spotifyURL };
 	};
 
 	const showDuplicationToast = () => {
@@ -92,57 +93,58 @@ const App = () => {
 
 		const item = generateMusicItem(url);
 
-		if(item.musicItem === "episode"){
+		if (item.musicItem === "episode") {
 			showEpisodeToast();
 		}
-		else{
-		const itemData = await getMusicItemData(item);
-		const images =
-			item?.musicItem === "track"
-				? itemData.album.images
-				: itemData.images;
-		const imageURL =
-			images && images.length > 0
-				? images[images.length - 1].url
-				: null;
-		const updatedMusicItem = {
-			...item,
-			name: itemData.name,
-			imageURL: imageURL,
-			spotifyURI: itemData.uri
-		};
+		else {
+			const itemData = await getMusicItemData(item);
+			const images =
+				item?.musicItem === "track"
+					? itemData.album.images
+					: itemData.images;
+			const imageURL =
+				images && images.length > 0
+					? images[images.length - 1].url
+					: null;
+			const updatedMusicItem = {
+				...item,
+				name: itemData.name,
+				imageURL: imageURL,
+				spotifyURI: itemData.uri
+			};
 
-		let updatedMusicItems;
+			let updatedMusicItems;
 
-		if (
-			musicItems.find(
-				(musicItem) =>
-					updatedMusicItem.id === musicItem.id
-			)
-		) {
-			updatedMusicItems = [...musicItems];
-			showDuplicationToast();
-		} else {
-			updatedMusicItems = [
-				...musicItems,
-				updatedMusicItem
-			];
+			if (
+				musicItems.find(
+					(musicItem) =>
+						updatedMusicItem.id === musicItem.id
+				)
+			) {
+				updatedMusicItems = [...musicItems];
+				showDuplicationToast();
+			} else {
+				updatedMusicItems = [
+					...musicItems,
+					updatedMusicItem
+				];
+			}
+
+			setURL("");
+
+			try {
+				await AsyncStorage.setItem(
+					"musicItems",
+					JSON.stringify(updatedMusicItems)
+				);
+				setMusicItems(updatedMusicItems);
+			} catch (error) {
+				console.error(
+					"Something went wrong adding music item:",
+					error
+				);
+			}
 		}
-
-		setURL("");
-
-		try {
-			await AsyncStorage.setItem(
-				"musicItems",
-				JSON.stringify(updatedMusicItems)
-			);
-			setMusicItems(updatedMusicItems);
-		} catch (error) {
-			console.error(
-				"Something went wrong adding music item:",
-				error
-			);
-		}}
 	}
 
 	const getMusicItems = async () => {
